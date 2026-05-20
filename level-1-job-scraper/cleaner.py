@@ -63,8 +63,12 @@ def clean_jobs(df, keyword):
 
     if "tags" in df.columns:
         # .apply() runs a function on every row in the column.
-        # lambda x: is a short anonymous function.
-        # If x is a list, join it into one comma-separated string; otherwise use empty string.
+        # lambda x: is a short anonymous function — it works like def but on one line.
+        # isinstance(x, list) checks whether x is actually a Python list (returns True/False).
+        # We need this check because some rows might have None or a plain string in the tags field
+        # instead of a proper list — and calling .join() on those would crash.
+        # If x is a list → join items into one comma-separated string e.g. "python,django,remote"
+        # If x is anything else (None, string, etc.) → use an empty string so the row isn't skipped
         df["tags_str"] = df["tags"].apply(
             lambda x: ",".join(x) if isinstance(x, list) else ""
         )

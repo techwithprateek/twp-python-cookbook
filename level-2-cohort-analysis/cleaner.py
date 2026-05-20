@@ -62,9 +62,12 @@ def clean_data(df):
     print(f"  Removed {bad_dates:,} rows with unparseable dates")
 
     # ── Step 7: Add InvoiceMonth column ──────────────────────────────────────
-    # We only care about the MONTH of each purchase, not the exact day/time.
-    # dt.to_period('M') converts a datetime to a "Month Period" e.g. 2020-12
-    # This makes grouping by month much easier later.
+    # We only care about the MONTH of each purchase, not the exact day or time.
+    # dt.to_period('M') converts a full datetime (e.g. 2020-12-05 09:31:00)
+    # into a "Month Period" object that represents the whole month (e.g. 2020-12).
+    # A Period is better than a datetime here because all transactions in December 2020
+    # will have the SAME value (2020-12), making grouping by month straightforward.
+    # If we kept full datetimes, 2020-12-05 and 2020-12-19 would look like different groups.
     df["InvoiceMonth"] = df["InvoiceDate"].dt.to_period("M")
 
     # Reset row index after all the filtering

@@ -60,17 +60,24 @@ def compute_rfm(df):
     q = config.NUM_QUANTILES
 
     # RECENCY: lower days = better → we INVERT the labels so score 5 = most recent
+    # range(q, 0, -1) counts backwards: range(5, 0, -1) → [5, 4, 3, 2, 1]
+    # This assigns score 5 to customers with the FEWEST days since last purchase (bought recently)
+    # and score 1 to customers who haven't bought in a long time.
     rfm["R_score"] = pd.qcut(rfm["Recency"],
                              q=q,
                              labels=list(range(q, 0, -1)),   # [5,4,3,2,1]
                              duplicates="drop")
 
     # FREQUENCY: higher = better → score 5 = most frequent
+    # .rank(method="first") assigns each customer a unique ranking number (1st, 2nd, 3rd...).
+    # If two customers have the same frequency, the one that appears first gets the lower rank.
+    # We rank BEFORE using qcut() because qcut needs evenly-sized groups, and duplicate
+    # values can cause unequal splits — ranking first ensures every value is unique.
     rfm["F_score"] = pd.qcut(rfm["Frequency"].rank(method="first"),
                              q=q,
                              labels=list(range(1, q + 1)))   # [1,2,3,4,5]
 
-    # MONETARY: higher = better → score 5 = highest spend
+    # MONETARY: higher = better → score 5 = highest spend (same rank logic as Frequency above)
     rfm["M_score"] = pd.qcut(rfm["Monetary"].rank(method="first"),
                              q=q,
                              labels=list(range(1, q + 1)))
@@ -80,7 +87,10 @@ def compute_rfm(df):
     rfm["F_score"] = rfm["F_score"].astype(int)
     rfm["M_score"] = rfm["M_score"].astype(int)
 
-    # Create a combined RFM string score e.g. "543" for quick reference
+    # Create a combined RFM string score e.g. "543" for quick reference.
+    # .astype(str) converts each integer score (5, 4, 3) into a string ("5", "4", "3").
+    # The + operator on strings concatenates them: "5" + "4" + "3" = "543"
+    # This is string joining, NOT addition — 5 + 4 + 3 = 12, but "5"+"4"+"3" = "543".
     rfm["RFM_Score"] = (rfm["R_score"].astype(str)
                         + rfm["F_score"].astype(str)
                         + rfm["M_score"].astype(str))

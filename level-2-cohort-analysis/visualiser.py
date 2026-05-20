@@ -5,6 +5,7 @@
 
 import matplotlib.pyplot as plt   # base plotting library
 import matplotlib.ticker as mticker
+import math                        # math.isnan() checks if a cell has no value (NaN = Not a Number)
 import os                         # file path helpers
 
 
@@ -60,7 +61,7 @@ def plot_heatmap(retention_pct, output_folder="output"):
     for row_idx in range(len(retention_display.index)):
         for col_idx in range(len(retention_display.columns)):
             value = retention_display.values[row_idx, col_idx]
-            if not __import__("math").isnan(value):
+            if not math.isnan(value):   # skip empty cells (NaN = no data for that cohort/month)
                 # Pick text colour: white on dark cells, black on light cells
                 text_color = "white" if value > 60 else "black"
                 ax.text(

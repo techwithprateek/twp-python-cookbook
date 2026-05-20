@@ -48,8 +48,10 @@ def build_retention_matrix(df):
     df = df.merge(first_purchase, on="Customer ID", how="left")
 
     # ── Step 3: Calculate CohortIndex (months since first purchase) ──────────
-    # Subtracting two Period objects gives a number of months.
-    # We use .apply() to do this row-by-row.
+    # Subtracting two Period objects gives a special "offset" object — not a plain number.
+    # .apply(lambda x: x.n) extracts the actual integer from each of those offset objects.
+    # x.n is pandas' way of reading the numeric value out of a Period difference.
+    # Example: (2020-12) - (2020-09) gives an offset of 3, and .n pulls out the integer 3.
     # The result tells us: "this transaction happened N months after the customer first bought."
     df["CohortIndex"] = (df["InvoiceMonth"] - df["CohortMonth"]).apply(lambda x: x.n)
 
@@ -77,7 +79,9 @@ def build_retention_matrix(df):
     # We divide every column by column 0 to get "what % are still buying in month N?"
     cohort_size = cohort_pivot[0]   # Series of cohort sizes (one per row)
 
-    # .divide(cohort_size, axis=0) divides each row by that row's cohort size
+    # .divide(cohort_size, axis=0) divides each row by that row's cohort size.
+    # axis=0 means "align along rows" — so each row gets divided by its own cohort size value.
+    # Without axis=0, pandas would try to match by column labels instead, which is wrong here.
     # Multiply by 100 to convert to percentages. Round to 1 decimal place.
     retention_pct = cohort_pivot.divide(cohort_size, axis=0).mul(100).round(1)
 

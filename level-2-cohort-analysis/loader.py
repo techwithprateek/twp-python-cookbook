@@ -54,7 +54,12 @@ def _generate_sample_data():
     import numpy as np
     import random
 
-    # Fix the random seed so results are the same every time
+    # Fix the random seed so results are the same every time you run this code.
+    # A "seed" is a starting number that controls how random numbers are generated.
+    # Same seed → same sequence of random numbers → same data every run.
+    # This makes testing and debugging easier because the output doesn't change each time.
+    # We set BOTH random.seed() and np.random.seed() because we use both libraries below.
+    # The number 42 is arbitrary — any integer works.
     random.seed(42)
     np.random.seed(42)
 

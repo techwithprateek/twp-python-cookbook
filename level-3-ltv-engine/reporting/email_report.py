@@ -46,13 +46,20 @@ def send_report(rfm):
                        f"<td>£{row['Revenue']:,.0f}</td></tr>\n")
 
     # ── Embed the dashboard image as base64 ──────────────────────────────────
-    # base64 encoding turns a binary image file into a text string.
-    # This lets us put the image directly inside the HTML without a separate file.
+    # base64 encoding converts a binary image file into a plain text string.
+    # This lets us paste the image directly inside the HTML — no attachment needed.
+    # "rb" mode = open the file in binary (read) mode — required for images and non-text files.
+    # base64.b64encode() converts the raw bytes into base64 bytes.
+    # .decode("utf-8") converts those base64 bytes into a regular Python string we can embed in HTML.
     img_path = os.path.join(config.OUTPUT_FOLDER, config.DASHBOARD_IMG)
     with open(img_path, "rb") as f:
         img_b64 = base64.b64encode(f.read()).decode("utf-8")
 
     # ── Build the full HTML email body ────────────────────────────────────────
+    # f"""...""" is a multi-line f-string — triple quotes let us write across many lines
+    # without needing \n escape characters.
+    # The f prefix means Python will replace {variables} with their actual values.
+    # {table_rows} will be replaced with the HTML table rows we built above.
     html_body = f"""
     <html><body>
     <h2>📊 Weekly LTV Report</h2>
@@ -68,6 +75,10 @@ def send_report(rfm):
     """
 
     # ── Assemble the email message ────────────────────────────────────────────
+    # MIMEMultipart("alternative") creates an email that can contain multiple versions
+    # of the same content (e.g. a plain-text version AND an HTML version).
+    # Email clients will automatically display the HTML version if they support it,
+    # or fall back to plain text on older clients.
     msg = MIMEMultipart("alternative")
     msg["Subject"] = "Weekly Customer LTV Report"
     msg["From"]    = config.EMAIL_FROM

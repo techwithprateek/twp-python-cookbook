@@ -54,8 +54,11 @@ print("▶  Running pipeline now (first-time startup run)...")
 run_pipeline()
 
 # ── Keep the scheduler alive ─────────────────────────────────────────────────
-# This loop runs forever, checking every 60 seconds whether a job is due.
-# schedule.run_pending() fires any jobs whose scheduled time has passed.
+# This loop runs forever, waking up every 60 seconds to check if a job is due.
+# schedule.run_pending() looks at all registered jobs and runs any whose time has arrived.
+# "Pending" means "scheduled but not yet run since it was last due".
+# time.sleep(60) pauses the script for 60 seconds before checking again.
+# Without this loop the script would exit immediately — we must keep it running.
 while True:
     schedule.run_pending()
     time.sleep(60)   # check every 60 seconds — no need to check more often

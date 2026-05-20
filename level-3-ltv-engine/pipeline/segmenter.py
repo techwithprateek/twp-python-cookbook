@@ -63,7 +63,9 @@ def assign_segments(rfm):
         # Default: Lost
         return "Lost"
 
-    # .apply() runs _get_segment on every row (axis=1 means row-by-row)
+    # .apply() runs _get_segment() on every row.
+    # axis=1 tells pandas to pass each ROW as a Series into the function.
+    # Without axis=1, pandas would pass each COLUMN instead — which is not what we want.
     rfm = rfm.copy()
     rfm["Segment"] = rfm.apply(_get_segment, axis=1)
 
@@ -75,6 +77,10 @@ def assign_segments(rfm):
                .sort_values("Revenue", ascending=False))
 
     for segment, row in summary.iterrows():
+        # f-string format specifiers control column alignment for neat printing:
+        #   {segment:<15}  = left-align the segment name, padded to 15 characters wide
+        #   {int(...):>5}  = right-align the customer count in 5 characters
+        #   {:>10,.0f}     = right-align revenue in 10 chars, with comma separators, no decimals
         print(f"  {segment:<15}: {int(row['Customers']):>5} customers   "
               f"£{row['Revenue']:>10,.0f} revenue")
 

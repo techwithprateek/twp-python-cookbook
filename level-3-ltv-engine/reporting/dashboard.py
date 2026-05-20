@@ -48,9 +48,9 @@ def build_dashboard(rfm):
         segment_counts.values,
         labels=segment_counts.index,
         colors=colors_ordered,
-        autopct="%1.1f%%",     # show percentage inside each slice
+        autopct="%1.1f%%",     # show percentage inside each slice e.g. "23.4%"
         startangle=90,
-        pctdistance=0.8,
+        pctdistance=0.8,       # how far from the centre the % labels sit (0.8 = 80% of the radius)
     )
     ax1.set_title("Customer Count by Segment", fontweight="bold")
 
@@ -64,11 +64,15 @@ def build_dashboard(rfm):
     ax2.set_title("Total Revenue by Segment", fontweight="bold")
     ax2.set_ylabel("Revenue (£)")
     ax2.tick_params(axis="x", rotation=20)
-    # Add value labels on top of each bar
+    # Add a revenue label on top of each bar.
+    # bar.get_x()      = the left edge x-position of the bar
+    # bar.get_width()  = the width of the bar
+    # bar.get_height() = the height of the bar (= the revenue value)
+    # We place the text at the horizontal centre and just 1% above the bar top.
     for bar in bars:
-        ax2.text(bar.get_x() + bar.get_width() / 2,
-                 bar.get_height() * 1.01,
-                 f"£{bar.get_height():,.0f}",
+        ax2.text(bar.get_x() + bar.get_width() / 2,   # horizontal centre of bar
+                 bar.get_height() * 1.01,              # 1% above the bar top
+                 f"£{bar.get_height():,.0f}",          # label text e.g. "£12,345"
                  ha="center", va="bottom", fontsize=8)
 
     # ── Panel 3: Histogram — distribution of RFM total scores ────────────────
