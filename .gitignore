@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Output files (generated on each run)
+level-1-job-scraper/output/
+level-2-cohort-analysis/output/
+level-3-ltv-engine/output/
+
+# Cleaned CSV cache (regenerated from source)
+level-3-ltv-engine/data/online_retail_II_clean.csv
+
+# Large data files (user downloads these themselves)
+*.xlsx
+*.csv
+!**/requirements.txt
+
+# macOS
+.DS_Store
